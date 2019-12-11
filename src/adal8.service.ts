@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { bindCallback } from 'rxjs/internal/observable/bindCallback';
 import { timer } from 'rxjs/internal/observable/timer';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { first } from 'rxjs/operators';
 import User = adal.User;
 
 /**
@@ -23,7 +25,7 @@ export class Adal8Service {
      * @memberOf Adal8Service
      */
     private adalContext: adal.AuthenticationContext;
-    private loginRefreshTimer = <any>null;
+    private loginRefreshTimer: Subscription;
 
     /**
      *
@@ -204,7 +206,7 @@ export class Adal8Service {
      *
      * @memberOf Adal8Service
      */
-    public acquireToken(resource: string) {
+    public acquireToken(resource: string): Observable<string> {
         const _this = this;   // save outer this for inner function
 
         let errorMessage: string;
@@ -366,13 +368,13 @@ export class Adal8Service {
      * @memberOf Adal8Service
      */
     private refreshLoginToken(): void {
-        if (!this.adal8User.loginCached) throw ('User not logged in');
+        if (!this.adal8User.loginCached) {
+            throw ('User not logged in');
+        }
         this.acquireToken(<any>this.adalContext.config.loginResource).subscribe((token: string) => {
             this.adal8User.token = token;
             this.userInfo.token = token;
-            if (this.adal8User.authenticated == false) {
-                this.adal8User.authenticated = true;
-                this.adal8User.error = '';
+            if (!this.adal8User.authenticated) {
                 window.location.reload();
             } else {
                 this.setupLoginTokenRefreshTimer();
@@ -399,10 +401,16 @@ export class Adal8Service {
 
         // Either wait until the refresh window is valid or refresh in 1 second (measured in seconds)
         let timerDelay = exp - this.now() - (this.adalContext.config.expireOffsetSeconds || 300) > 0 ? exp - this.now() - (this.adalContext.config.expireOffsetSeconds || 300) : 1;
-        if (this.loginRefreshTimer) this.loginRefreshTimer.unsubscribe();
-        this.loginRefreshTimer = timer(timerDelay * 1000).subscribe((x) => {
-            this.refreshLoginToken();
-        });
+        if (this.loginRefreshTimer) {
+            this.loginRefreshTimer.unsubscribe();
+        }
+        this.loginRefreshTimer = timer(timerDelay * 1000)
+            .pipe(
+                first()
+            )
+            .subscribe((x) => {
+                this.refreshLoginToken();
+            });
 
     }
 }
