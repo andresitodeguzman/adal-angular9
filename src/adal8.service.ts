@@ -242,10 +242,11 @@ export class Adal8Service {
      * @memberOf Adal8Service
      */
     public getUser(): Observable<any> {
+        const _this = this;   // save outer this for inner function
         return bindCallback((cb: (u: adal.User) => User) => {
-            this.adalContext.getUser(function (error: string, user: adal.User) {
+            _this.adalContext.getUser(function (error: string, user: adal.User) {
                 if (error) {
-                    this.adalContext.error('Error when getting user', error);
+                    _this.adalContext.error('Error when getting user', error);
                     cb(null);
                 } else {
                     cb(user);
