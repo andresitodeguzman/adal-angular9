@@ -58,7 +58,7 @@
         "karma-jasmine": "~2.0.1",
         "karma-typescript": "~4.1.0",
         "merge2": "^1.2.3",
-        "tslint": "^5.17.0",
+        "tslint": "^6.1.2",
         "typescript": "~3.5.1",
         "typescript-require": "^0.2.10",
         "typescript-register": "^1.1.0"
