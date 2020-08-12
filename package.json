@@ -55,7 +55,7 @@
         "jshint": "^2.10.2",
         "karma": "~4.1.0",
         "karma-chrome-launcher": "~2.2.0",
-        "karma-jasmine": "~2.0.1",
+        "karma-jasmine": "~4.0.0",
         "karma-typescript": "~4.1.0",
         "merge2": "^1.2.3",
         "tslint": "^5.17.0",
